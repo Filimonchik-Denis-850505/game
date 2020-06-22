@@ -1,7 +1,8 @@
 .286
 .model small
 .stack 100h
-.data
+.data    
+    VIDEOR db 0,0
     title_message db "PRESS ANY KEY TO START", 0
 	empty_title db "                       ", 0
 	gameover_message db "GAME OVER", 0
@@ -28,7 +29,7 @@
 	end_game_flag db 0
 	object_counter db 0
 	dec_speed_flag db 0
-	screen_attribute equ 1000000b
+	screen_attribute equ 0100000b
 	TRUE equ 1
 	FALSE equ 0
 	border_upper_side equ 105
@@ -624,7 +625,10 @@ print_score endp
 
 _start:
     mov ax, @data
-    mov ds, ax
+    mov ds, ax 
+    mov ah, 0fh
+    int 10h
+    mov VIDEOR, al
 	call init_screen_mode
 	call hide_cursor
 	call show_title
@@ -656,8 +660,13 @@ _start:
 _exit:
 call buffer_clear
 call buffer_render
-call show_gameover
-    mov ah,00h
-    mov al,03h
-    int 10h
+call show_gameover 
+
+mov ax, word ptr VIDEOR
+int 10h
+mov ah, 4ch
+int 21h
+    ;mov ah,00h
+    ;mov al,03h
+    ;int 10h 
 end _start
